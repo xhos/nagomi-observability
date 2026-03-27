@@ -1,0 +1,175 @@
+// null-core
+local.file_match "null_core_logs" {
+	path_targets = [{ "__path__" = "/var/log/null-core.log" }]
+}
+
+loki.source.file "null_core" {
+	targets       = local.file_match.null_core_logs.targets
+	forward_to    = [loki.process.null_core.receiver]
+	tail_from_end = false
+}
+
+loki.process "null_core" {
+	stage.json {
+		expressions = {
+			timestamp    = "time",
+			level        = "level",
+			prefix       = "prefix",
+			error        = "err",
+			user_id      = "user_id",
+			procedure    = "procedure",
+			duration_ms  = "duration_ms",
+			status       = "status",
+			path         = "path",
+		}
+	}
+	stage.timestamp {
+		source   = "timestamp"
+		format   = "2006/01/02 15:04:05"
+		location = "America/Toronto"
+	}
+	stage.static_labels {
+		values = { app = "null-core" }
+	}
+	stage.labels {
+		values = {
+			level     = "level",
+			prefix    = "prefix",
+			user_id   = "user_id",
+			procedure = "procedure",
+			status    = "status",
+		}
+	}
+	forward_to = [loki.write.default.receiver]
+}
+
+// null-email-parser
+local.file_match "null_email_parser_logs" {
+	path_targets = [{ "__path__" = "/var/log/null-email-parser.log" }]
+}
+
+loki.source.file "null_email_parser" {
+	targets       = local.file_match.null_email_parser_logs.targets
+	forward_to    = [loki.process.null_email_parser.receiver]
+	tail_from_end = false
+}
+
+loki.process "null_email_parser" {
+	stage.json {
+		expressions = {
+			timestamp   = "time",
+			level       = "level",
+			prefix      = "prefix",
+			error       = "err",
+			procedure   = "procedure",
+			duration_ms = "duration_ms",
+			status      = "status",
+		}
+	}
+	stage.timestamp {
+		source   = "timestamp"
+		format   = "2006/01/02 15:04:05"
+		location = "America/Toronto"
+	}
+	stage.static_labels {
+		values = { app = "null-email-parser" }
+	}
+	stage.labels {
+		values = {
+			level     = "level",
+			prefix    = "prefix",
+			procedure = "procedure",
+			status    = "status",
+		}
+	}
+	forward_to = [loki.write.default.receiver]
+}
+
+// null-receipts
+local.file_match "null_receipts_logs" {
+	path_targets = [{ "__path__" = "/var/log/null-receipts.log" }]
+}
+
+loki.source.file "null_receipts" {
+	targets       = local.file_match.null_receipts_logs.targets
+	forward_to    = [loki.process.null_receipts.receiver]
+	tail_from_end = false
+}
+
+loki.process "null_receipts" {
+	stage.json {
+		expressions = {
+			timestamp   = "time",
+			level       = "level",
+			prefix      = "prefix",
+			error       = "err",
+			procedure   = "procedure",
+			duration_ms = "duration_ms",
+			status      = "status",
+			path        = "path",
+		}
+	}
+	stage.timestamp {
+		source   = "timestamp"
+		format   = "2006/01/02 15:04:05"
+		location = "America/Toronto"
+	}
+	stage.static_labels {
+		values = { app = "null-receipts" }
+	}
+	stage.labels {
+		values = {
+			level     = "level",
+			prefix    = "prefix",
+			procedure = "procedure",
+			status    = "status",
+		}
+	}
+	forward_to = [loki.write.default.receiver]
+}
+
+// null-gateway
+local.file_match "null_gateway_logs" {
+	path_targets = [{ "__path__" = "/var/log/null-gateway.log" }]
+}
+
+loki.source.file "null_gateway" {
+	targets       = local.file_match.null_gateway_logs.targets
+	forward_to    = [loki.process.null_gateway.receiver]
+	tail_from_end = false
+}
+
+loki.process "null_gateway" {
+	stage.json {
+		expressions = {
+			timestamp   = "time",
+			level       = "level",
+			error       = "err",
+			method      = "method",
+			path        = "path",
+			duration_ms = "duration_ms",
+			status      = "status",
+		}
+	}
+	stage.timestamp {
+		source = "timestamp"
+		format = "RFC3339Nano"
+	}
+	stage.static_labels {
+		values = { app = "null-gateway" }
+	}
+	stage.labels {
+		values = {
+			level  = "level",
+			method = "method",
+			status = "status",
+		}
+	}
+	forward_to = [loki.write.default.receiver]
+}
+
+loki.write "default" {
+	endpoint {
+		url = "http://loki:3100/loki/api/v1/push"
+	}
+}

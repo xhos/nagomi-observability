@@ -1,0 +1,158 @@
+{
+  "title": "services",
+  "uid": "null-services",
+  "schemaVersion": 39,
+  "time": { "from": "now-3h", "to": "now" },
+  "refresh": "10s",
+  "templating": {
+    "list": [
+      {
+        "name": "service",
+        "type": "query",
+        "label": "Service",
+        "datasource": { "type": "loki", "uid": "loki" },
+        "query": "label_values(app)",
+        "current": { "value": "null-core", "text": "null-core", "selected": true },
+        "refresh": 1,
+        "multi": false,
+        "includeAll": false,
+        "sort": 1
+      }
+    ]
+  },
+  "panels": [
+    {
+      "id": 1,
+      "type": "timeseries",
+      "title": "Log rate by level",
+      "gridPos": { "x": 0, "y": 0, "w": 24, "h": 6 },
+      "fieldConfig": {
+        "defaults": {
+          "custom": { "fillOpacity": 10, "lineWidth": 2, "drawStyle": "bars" }
+        },
+        "overrides": [
+          { "matcher": { "id": "byName", "options": "error" }, "properties": [{ "id": "color", "value": { "mode": "fixed", "fixedColor": "red" } }] },
+          { "matcher": { "id": "byName", "options": "warn" },  "properties": [{ "id": "color", "value": { "mode": "fixed", "fixedColor": "orange" } }] },
+          { "matcher": { "id": "byName", "options": "info" },  "properties": [{ "id": "color", "value": { "mode": "fixed", "fixedColor": "blue" } }] },
+          { "matcher": { "id": "byName", "options": "debug" }, "properties": [{ "id": "color", "value": { "mode": "fixed", "fixedColor": "green" } }] }
+        ]
+      },
+      "options": { "legend": { "displayMode": "list", "placement": "bottom" } },
+      "targets": [
+        {
+          "datasource": { "type": "loki", "uid": "loki" },
+          "expr": "sum by (level) (count_over_time({app=\"$service\"} | json [$__auto]))",
+          "legendFormat": "{{level}}",
+          "queryType": "range"
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "type": "timeseries",
+      "title": "Request duration by procedure",
+      "gridPos": { "x": 0, "y": 6, "w": 24, "h": 8 },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "ms",
+          "custom": { "fillOpacity": 5, "lineWidth": 2 }
+        }
+      },
+      "options": {
+        "legend": { "displayMode": "table", "placement": "right", "calcs": ["mean", "max", "p95"] }
+      },
+      "targets": [
+        {
+          "datasource": { "type": "loki", "uid": "loki" },
+          "expr": "quantile_over_time(0.95, {app=\"$service\"} | json | procedure != `` | unwrap duration_ms [$__auto]) by (procedure)",
+          "legendFormat": "p95 {{procedure}}",
+          "queryType": "range"
+        },
+        {
+          "datasource": { "type": "loki", "uid": "loki" },
+          "expr": "quantile_over_time(0.50, {app=\"$service\"} | json | procedure != `` | unwrap duration_ms [$__auto]) by (procedure)",
+          "legendFormat": "p50 {{procedure}}",
+          "queryType": "range"
+        }
+      ]
+    },
+    {
+      "id": 4,
+      "type": "table",
+      "title": "Procedure summary",
+      "gridPos": { "x": 0, "y": 14, "w": 24, "h": 8 },
+      "fieldConfig": {
+        "defaults": { "unit": "ms" },
+        "overrides": [
+          { "matcher": { "id": "byName", "options": "requests" }, "properties": [{ "id": "unit", "value": "short" }] },
+          { "matcher": { "id": "byName", "options": "errors" },   "properties": [{ "id": "unit", "value": "short" }, { "id": "custom.displayMode", "value": "color-text" }, { "id": "thresholds", "value": { "mode": "absolute", "steps": [{ "color": "green", "value": null }, { "color": "red", "value": 1 }] } }] }
+        ]
+      },
+      "options": { "sortBy": [{ "displayName": "p95", "desc": true }] },
+      "targets": [
+        {
+          "datasource": { "type": "loki", "uid": "loki" },
+          "expr": "sum by (procedure) (count_over_time({app=\"$service\"} | json | procedure != `` [$__range]))",
+          "legendFormat": "{{procedure}}",
+          "queryType": "instant",
+          "refId": "requests"
+        },
+        {
+          "datasource": { "type": "loki", "uid": "loki" },
+          "expr": "quantile_over_time(0.50, {app=\"$service\"} | json | procedure != `` | unwrap duration_ms [$__range]) by (procedure)",
+          "legendFormat": "{{procedure}}",
+          "queryType": "instant",
+          "refId": "p50"
+        },
+        {
+          "datasource": { "type": "loki", "uid": "loki" },
+          "expr": "quantile_over_time(0.95, {app=\"$service\"} | json | procedure != `` | unwrap duration_ms [$__range]) by (procedure)",
+          "legendFormat": "{{procedure}}",
+          "queryType": "instant",
+          "refId": "p95"
+        },
+        {
+          "datasource": { "type": "loki", "uid": "loki" },
+          "expr": "sum by (procedure) (count_over_time({app=\"$service\"} | json | procedure != `` | status = `500` [$__range]))",
+          "legendFormat": "{{procedure}}",
+          "queryType": "instant",
+          "refId": "errors"
+        }
+      ],
+      "transformations": [
+        { "id": "merge", "options": {} },
+        {
+          "id": "organize",
+          "options": {
+            "renameByName": { "Value #requests": "requests", "Value #p50": "p50", "Value #p95": "p95", "Value #errors": "errors" },
+            "excludeByName": { "Time": true },
+            "indexByName": { "procedure": 0, "requests": 1, "p50": 2, "p95": 3, "errors": 4 }
+          }
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "type": "logs",
+      "title": "Logs",
+      "gridPos": { "x": 0, "y": 22, "w": 24, "h": 18 },
+      "options": {
+        "dedupStrategy": "none",
+        "showLabels": false,
+        "showCommonLabels": false,
+        "wrapLogMessage": false,
+        "prettifyLogMessage": true,
+        "enableLogDetails": true,
+        "sortOrder": "Descending",
+        "displayedFields": ["msg", "procedure", "path", "status", "duration_ms", "err"]
+      },
+      "targets": [
+        {
+          "datasource": { "type": "loki", "uid": "loki" },
+          "expr": "{app=\"$service\"} | json",
+          "queryType": "range"
+        }
+      ]
+    }
+  ]
+}

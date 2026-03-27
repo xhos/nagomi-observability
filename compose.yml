@@ -1,0 +1,33 @@
+services:
+  loki:
+    image: grafana/loki:3.5.5
+    volumes:
+      - ./loki.yaml:/etc/loki/config.yaml
+    command: -config.file=/etc/loki/config.yaml
+
+  alloy:
+    image: grafana/alloy:latest
+    volumes:
+      - ./config.alloy:/etc/alloy/config.alloy
+      - ../null-core/null-core.log:/var/log/null-core.log:ro
+      - ../null-email-parser/null-email-parser.log:/var/log/null-email-parser.log:ro
+      - ../null-receipts/null-receipts.log:/var/log/null-receipts.log:ro
+      - ../null-gateway/null-gateway.log:/var/log/null-gateway.log:ro
+    command: run /etc/alloy/config.alloy --server.http.listen-addr=0.0.0.0:12345
+    depends_on:
+      - loki
+
+  grafana:
+    image: grafana/grafana:12.3.0-17782621999
+    ports:
+      - "56000:3000"
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+    volumes:
+      - grafana-storage:/var/lib/grafana
+      - ./provisioning:/etc/grafana/provisioning
+    depends_on:
+      - loki
+
+volumes:
+  grafana-storage:
