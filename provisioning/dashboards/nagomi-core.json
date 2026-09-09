@@ -1,6 +1,6 @@
 {
   "title": "services",
-  "uid": "null-services",
+  "uid": "nagomi-services",
   "schemaVersion": 39,
   "time": { "from": "now-3h", "to": "now" },
   "refresh": "10s",
@@ -12,7 +12,7 @@
         "label": "Service",
         "datasource": { "type": "loki", "uid": "loki" },
         "query": "label_values(app)",
-        "current": { "value": "null-core", "text": "null-core", "selected": true },
+        "current": { "value": "nagomi-core", "text": "nagomi-core", "selected": true },
         "refresh": 1,
         "multi": false,
         "includeAll": false,

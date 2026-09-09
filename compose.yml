@@ -9,10 +9,10 @@ services:
     image: grafana/alloy:latest
     volumes:
       - ./config.alloy:/etc/alloy/config.alloy
-      - ../null-core/null-core.log:/var/log/null-core.log:ro
-      - ../null-email-parser/null-email-parser.log:/var/log/null-email-parser.log:ro
-      - ../null-receipts/null-receipts.log:/var/log/null-receipts.log:ro
-      - ../null-gateway/null-gateway.log:/var/log/null-gateway.log:ro
+      - ../nagomi-core/nagomi-core.log:/var/log/nagomi-core.log:ro
+      - ../nagomi-email-parser/nagomi-email-parser.log:/var/log/nagomi-email-parser.log:ro
+      - ../nagomi-receipts/nagomi-receipts.log:/var/log/nagomi-receipts.log:ro
+      - ../nagomi-gateway/nagomi-gateway.log:/var/log/nagomi-gateway.log:ro
     command: run /etc/alloy/config.alloy --server.http.listen-addr=0.0.0.0:12345
     depends_on:
       - loki

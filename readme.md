@@ -1,6 +1,6 @@
-# null-observability
+# nagomi-observability
 
-Observability stack for null. For now just collects and visualises logs from most services.
+Observability stack for nagomi. For now just collects and visualises logs from most services.
 
 ## stack
 
@@ -25,7 +25,7 @@ The service will appear automatically in the Grafana dashboard dropdown.
 
 | service | log file |
 |---|---|
-| null-core | `null-core/null-core.log` |
-| null-email-parser | `null-email-parser/null-email-parser.log` |
-| null-receipts | `null-receipts/null-receipts.log` |
-| null-gateway | `null-gateway/null-gateway.log` |
+| nagomi-core | `nagomi-core/nagomi-core.log` |
+| nagomi-email-parser | `nagomi-email-parser/nagomi-email-parser.log` |
+| nagomi-receipts | `nagomi-receipts/nagomi-receipts.log` |
+| nagomi-gateway | `nagomi-gateway/nagomi-gateway.log` |

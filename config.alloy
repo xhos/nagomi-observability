@@ -1,15 +1,15 @@
-// null-core
-local.file_match "null_core_logs" {
-	path_targets = [{ "__path__" = "/var/log/null-core.log" }]
+// nagomi-core
+local.file_match "nagomi_core_logs" {
+	path_targets = [{ "__path__" = "/var/log/nagomi-core.log" }]
 }
 
-loki.source.file "null_core" {
-	targets       = local.file_match.null_core_logs.targets
-	forward_to    = [loki.process.null_core.receiver]
+loki.source.file "nagomi_core" {
+	targets       = local.file_match.nagomi_core_logs.targets
+	forward_to    = [loki.process.nagomi_core.receiver]
 	tail_from_end = false
 }
 
-loki.process "null_core" {
+loki.process "nagomi_core" {
 	stage.json {
 		expressions = {
 			timestamp    = "time",
@@ -29,7 +29,7 @@ loki.process "null_core" {
 		location = "America/Toronto"
 	}
 	stage.static_labels {
-		values = { app = "null-core" }
+		values = { app = "nagomi-core" }
 	}
 	stage.labels {
 		values = {
@@ -43,18 +43,18 @@ loki.process "null_core" {
 	forward_to = [loki.write.default.receiver]
 }
 
-// null-email-parser
-local.file_match "null_email_parser_logs" {
-	path_targets = [{ "__path__" = "/var/log/null-email-parser.log" }]
+// nagomi-email-parser
+local.file_match "nagomi_email_parser_logs" {
+	path_targets = [{ "__path__" = "/var/log/nagomi-email-parser.log" }]
 }
 
-loki.source.file "null_email_parser" {
-	targets       = local.file_match.null_email_parser_logs.targets
-	forward_to    = [loki.process.null_email_parser.receiver]
+loki.source.file "nagomi_email_parser" {
+	targets       = local.file_match.nagomi_email_parser_logs.targets
+	forward_to    = [loki.process.nagomi_email_parser.receiver]
 	tail_from_end = false
 }
 
-loki.process "null_email_parser" {
+loki.process "nagomi_email_parser" {
 	stage.json {
 		expressions = {
 			timestamp   = "time",
@@ -72,7 +72,7 @@ loki.process "null_email_parser" {
 		location = "America/Toronto"
 	}
 	stage.static_labels {
-		values = { app = "null-email-parser" }
+		values = { app = "nagomi-email-parser" }
 	}
 	stage.labels {
 		values = {
@@ -85,18 +85,18 @@ loki.process "null_email_parser" {
 	forward_to = [loki.write.default.receiver]
 }
 
-// null-receipts
-local.file_match "null_receipts_logs" {
-	path_targets = [{ "__path__" = "/var/log/null-receipts.log" }]
+// nagomi-receipts
+local.file_match "nagomi_receipts_logs" {
+	path_targets = [{ "__path__" = "/var/log/nagomi-receipts.log" }]
 }
 
-loki.source.file "null_receipts" {
-	targets       = local.file_match.null_receipts_logs.targets
-	forward_to    = [loki.process.null_receipts.receiver]
+loki.source.file "nagomi_receipts" {
+	targets       = local.file_match.nagomi_receipts_logs.targets
+	forward_to    = [loki.process.nagomi_receipts.receiver]
 	tail_from_end = false
 }
 
-loki.process "null_receipts" {
+loki.process "nagomi_receipts" {
 	stage.json {
 		expressions = {
 			timestamp   = "time",
@@ -115,7 +115,7 @@ loki.process "null_receipts" {
 		location = "America/Toronto"
 	}
 	stage.static_labels {
-		values = { app = "null-receipts" }
+		values = { app = "nagomi-receipts" }
 	}
 	stage.labels {
 		values = {
@@ -128,18 +128,18 @@ loki.process "null_receipts" {
 	forward_to = [loki.write.default.receiver]
 }
 
-// null-gateway
-local.file_match "null_gateway_logs" {
-	path_targets = [{ "__path__" = "/var/log/null-gateway.log" }]
+// nagomi-gateway
+local.file_match "nagomi_gateway_logs" {
+	path_targets = [{ "__path__" = "/var/log/nagomi-gateway.log" }]
 }
 
-loki.source.file "null_gateway" {
-	targets       = local.file_match.null_gateway_logs.targets
-	forward_to    = [loki.process.null_gateway.receiver]
+loki.source.file "nagomi_gateway" {
+	targets       = local.file_match.nagomi_gateway_logs.targets
+	forward_to    = [loki.process.nagomi_gateway.receiver]
 	tail_from_end = false
 }
 
-loki.process "null_gateway" {
+loki.process "nagomi_gateway" {
 	stage.json {
 		expressions = {
 			timestamp   = "time",
@@ -156,7 +156,7 @@ loki.process "null_gateway" {
 		format = "RFC3339Nano"
 	}
 	stage.static_labels {
-		values = { app = "null-gateway" }
+		values = { app = "nagomi-gateway" }
 	}
 	stage.labels {
 		values = {
